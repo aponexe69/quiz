@@ -477,6 +477,11 @@
             }, 500);
         }
 
+        // Default avatar SVG as data URL
+        const defaultAvatar =
+            'data:image/svg+xml;base64,' +
+            btoa(`<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"60\" height=\"60\" viewBox=\"0 0 60 60\"><circle cx=\"30\" cy=\"30\" r=\"30\" fill=\"#e0e7ef\"/><circle cx=\"30\" cy=\"24\" r=\"12\" fill=\"#60a5fa\"/><ellipse cx=\"30\" cy=\"44\" rx=\"16\" ry=\"10\" fill=\"#3b82f6\"/></svg>`);
+
         async function downloadCertificate() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({
@@ -556,19 +561,18 @@
             doc.rect(40, 90, 217, 60);
 
             // Add user photo with modern frame (positioned left side)
-            if (currentUser.picture) {
-                try {
-                    // Modern photo frame
-                    doc.setFillColor(255, 255, 255);
-                    doc.rect(55, 105, 40, 40, 'F');
-                    doc.setLineWidth(2);
-                    doc.setDrawColor(59, 130, 246);
-                    doc.rect(55, 105, 40, 40);
-                    // Add photo
-                    doc.addImage(currentUser.picture, 'JPEG', 60, 110, 30, 30);
-                } catch (e) {
-                    console.error("Error adding image to PDF: ", e);
-                }
+            let photoToUse = currentUser.picture ? currentUser.picture : defaultAvatar;
+            try {
+                // Modern photo frame
+                doc.setFillColor(255, 255, 255);
+                doc.rect(55, 105, 40, 40, 'F');
+                doc.setLineWidth(2);
+                doc.setDrawColor(59, 130, 246);
+                doc.rect(55, 105, 40, 40);
+                // Add photo or avatar
+                doc.addImage(photoToUse, 'JPEG', 60, 110, 30, 30);
+            } catch (e) {
+                console.error("Error adding image to PDF: ", e);
             }
 
             // Certification text (shifted right to avoid photo overlap)
